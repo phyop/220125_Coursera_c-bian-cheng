@@ -2,15 +2,19 @@
 # -*- coding: utf-8 -*-
 
 def leap_year(year):
-    """閏年規則
-公元年分非4的倍數，為平年。
-公元年分為4的倍數但非100的倍數，为闰年。
-公元年分為100的倍數但非400的倍數，为平年。
-公元年分為400的倍數為閏年。"""
-    if ...:
+    """非4的倍數（1st多），平年。
+    （剩下的都是4的倍數）
+    非100的倍數（2nd多），闰年，400的倍數，閏年。
+    100的倍數，非400的倍數，平年。
+    """
+    # 資料中，不是4的倍數比較多，所以先判斷這個，大部分的case在這個if就解決了，不用走到elif
+    if (year % 4 != 0): # 非4的倍數为平年
+        leap = False
+    # 剩下的都是4的倍數
+    elif (year % 100 != 0) or (year % 400 == 0):
         leap = True
-    else ...:
-        leap  = False
+    else:
+        leap = False
     return leap
 
 def what_day(year, month, day, yuandan):
