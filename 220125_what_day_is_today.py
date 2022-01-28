@@ -4,18 +4,17 @@
 def read_input(path):
     f = open(path,"r")
     line_1 = f.readline()
-    year, whatday_yuandan = line_1.split()[0], line_1.split()[1]
+    year, whatday_yuandan = int(line_1.split()[0]), int(line_1.split()[1])
     count = int(f.readline())
     month_ls = []
     day_ls = []
     for i in range(count):
         line = f.readline()
-        month, day = line.split()[0], line.split()[1]
+        month, day = int(line.split()[0]), int(line.split()[1])
         month_ls.append(month)
         day_ls.append(day)
-    testday_dict = dict(zip(month_ls, day_ls))
     f.close()
-    return (year, whatday_yuandan, count, testday_dict)
+    return (year, whatday_yuandan, count, month_ls, day_ls)
 
 def leap_year(year):
     """非4的倍數（1st多），平年。
@@ -33,35 +32,44 @@ def leap_year(year):
     return leap
 
 def date_0to12(year):
-    """# 若輸入的「月」有誤輸出 -1；若輸入的「日」有誤輸出 -2"""
+    # list有13個月份
     month_ls = [i for i in range(0,13)] # 包含0月
     day_ls = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31] # 0月爲0天
     if leap_year(year):
-        day_ls[1] = 29
+        day_ls[2] = 29
     day_dict = dict(zip(month_ls, day_ls))
     return day_dict
 
-def what_day(year, month, day, whatday_yuandan, date_dict):
+def what_day(year, month, day, whatday_yuandan, day_dict):
     """到4/6所增加的天數d = (date_dict.month[1]+...date_dict.month[4-1])+(6-1)
     假設1/1是禮拜6，而4/6是增加n周又5天(周四)：((d%7+6))%7=(5+6)%7=4,
     假設1/1是禮拜0(周日)，而4/6是增加n周又6天(周六)：((d%7+0))%7=(6+0)%7=6,
     假設1/1是禮拜whatday_yuandan，而month/day是：((d%7+whatday_yuandan))%7"""
     d = day-1
     for i in range(1, month):
-        d += date_dict.month[i]
+        d += day_dict.get(i)
     whatday = ((d%7+whatday_yuandan))%7
-    return what_day
+    return whatday
+
+def day_error(year, month, day):
+    """# 若輸入的「月」有誤輸出 -1；若輸入的「日」有誤輸出 -2"""
+    day_dict = date_0to12(year)
+    if month not in day_dict.keys():
+        return -1
+    if day > day_dict[month]:
+        return -2
 
 if __name__ == "__main__":
     path = "./in.txt"
-    year, whatday_yuandan, count, testday_dict = read_input(path)
+    year, whatday_yuandan, count, month_ls, day_ls = read_input(path)
     day_dict = date_0to12(year)
     for i in range(count):
-        month = day_dict[i]
-        day = day_dict[i].value
-        thatday = what_day(year, month, day, whatday_yuandan, day_dict)
+        if not day_error(year, month_ls[i], day_ls[i]):
+            thatday = what_day(year, month_ls[i], day_ls[i], whatday_yuandan, day_dict)
+        else:
+            thatday = day_error(year, month_ls[i], day_ls[i])
         print(thatday, end=" ")
-
+    print()
 #############################################################333
 """
 題目敘述
