@@ -13,9 +13,9 @@ def read_input(path):
         month, day = line.split()[0], line.split()[1]
         month_ls.append(month)
         day_ls.append(day)
-    date_dict = dict(zip(month_ls, day_ls))
+    testday_dict = dict(zip(month_ls, day_ls))
     f.close()
-    return (year, date_dict, whatday_yuandan)
+    return (year, whatday_yuandan, count, testday_dict)
 
 def leap_year(year):
     """非4的倍數（1st多），平年。
@@ -32,14 +32,14 @@ def leap_year(year):
         leap = False
     return leap
 
-def date_0to12(year, month):
+def date_0to12(year):
     """# 若輸入的「月」有誤輸出 -1；若輸入的「日」有誤輸出 -2"""
     month_ls = [i for i in range(0,13)] # 包含0月
     day_ls = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31] # 0月爲0天
     if leap_year(year):
         day_ls[1] = 29
-    date_dict = dict(zip(month_ls, day_ls))
-    return date_dict
+    day_dict = dict(zip(month_ls, day_ls))
+    return day_dict
 
 def what_day(year, month, day, whatday_yuandan, date_dict):
     """到4/6所增加的天數d = (date_dict.month[1]+...date_dict.month[4-1])+(6-1)
@@ -54,12 +54,13 @@ def what_day(year, month, day, whatday_yuandan, date_dict):
 
 if __name__ == "__main__":
     path = "./in.txt"
-    year, test_date_dict, whatday_yuandan = read_input(path)
-    leap = leap_year(year)
-
-    
-    date_0to12(year, month)
-    # print(whatday, end=" ")
+    year, whatday_yuandan, count, testday_dict = read_input(path)
+    day_dict = date_0to12(year)
+    for i in range(count):
+        month = day_dict[i]
+        day = day_dict[i].value
+        thatday = what_day(year, month, day, whatday_yuandan, day_dict)
+        print(thatday, end=" ")
 
 #############################################################333
 """
