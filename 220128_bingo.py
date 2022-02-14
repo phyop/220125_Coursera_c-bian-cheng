@@ -1,14 +1,27 @@
 import numpy as np
+import pandas as pd
 
 def read_input(path):
     f = open(path, "r")
-    n_person, m_matrix = f.readline().split[0], f.readline().split[1]
-    for i in range(m):
-        f.readline()
+    line_1 = f.readline()
+    persons, matrixes = int(line_1.split()[0]), int(line_1.split()[1])
+    ls_all = []
+    for i in range(persons):
+        ls_n = []
+        for j in range(matrixes):
+            ls_n.append(f.readline().strip('\n'))
+        ls_all.append(ls_n)
+    bingo_seq = list(map(int, f.readline().split()))
+    return persons, matrixes, ls_all, bingo_seq
 
 if __name__ == "__main__":
     path = "./in.txt"
-    n_person, m_matrix, num_ls = read_input(path)
+    persons, matrixes, ls_all, bingo_seq = read_input(path)
+    
+    
+
+
+
 
 
 """
