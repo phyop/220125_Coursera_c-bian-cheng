@@ -28,7 +28,6 @@ def bingo_condition(matrix_size, bingo_df, bingo): # 加起來是3就代表連�
         if (bingo_df.iloc[i,:].aggregate(np.sum) == 3) \
         or (bingo_df.iloc[:,i].aggregate(np.sum) == 3) \
         or (sum_diagonal_1 == 3) or (sum_diagonal_2 == 3):
-            print('bingo!!')
             return True
 
 def bingo_game(players, matrix_size, matrix_dict, bingo_ls):
@@ -38,17 +37,18 @@ def bingo_game(players, matrix_size, matrix_dict, bingo_ls):
     for i in range(len(bingo_ls)): # 開始一個個叫號
         bingo_num = bingo_ls[i] # 這回中了的話，這就是bingo數字
         # 剩下玩家如果要繼續玩，可以在這行做player_ls的更新
+        bingo = False # 還沒賓果成功
         for n in player_ls: # 剩下的玩家
             condition_df = condition_plate_ls[n]
             data_df = pd.DataFrame(matrix_dict[n])
             coordinate = np.where(data_df[:] == bingo_num) # 在玩家賓果盤找對應坐標
-            condition_df.iloc[int(coordinate[0]), int(coordinate[1])] = 1 # 在空賓果盤的該位置設標記1
-            bingo = False # 還沒賓果成功
-            print('bingo_seq:', bingo_num)
+            condition_df.iloc[int(coordinate[0]), int(coordinate[1])] = 1 # 在空賓果盤的該位置設標記1    
             bingo = bingo_condition(matrix_size, condition_df, bingo)
             if bingo == True:
-                print(condition_df)
-                return bingo_num
+                print(n, end=' ')
+        if bingo == True:
+            print(bingo_num, end=' ')
+            break
 
 if __name__ == "__main__":
     path = "./in.txt"
