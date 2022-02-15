@@ -16,8 +16,8 @@ def read_input(path):
         matrix_all.append(ls_n)
     for i in range(persons):
         matrix_dict[i] = pd.DataFrame(matrix_all[i])
-    bingo_seq = list(map(int, f.readline().split()))
-    return persons, matrix_size, matrix_dict, bingo_seq
+    bingo_ls = list(map(int, f.readline().split()))
+    return persons, matrix_size, matrix_dict, bingo_ls
 
 def bingo(matrix_df, matrix_size, bingo_seq):
     bingo_df = pd.DataFrame(columns=range(matrix_size), index=range(matrix_size))
@@ -31,7 +31,8 @@ def bingo(matrix_df, matrix_size, bingo_seq):
 
 if __name__ == "__main__":
     path = "./in.txt"
-    persons, matrix_size, matrix_dict, bingo_seq = read_input(path)
+    persons, matrix_size, matrix_dict, bingo_ls = read_input(path)
+       
 
 
 ########################################3
@@ -40,19 +41,34 @@ import numpy as np
 import pandas as pd
 
 matrix_size = 3
-bingo_seq = [1, 2, 4, 8, 6, 3, 9, 5, 7]
+bingo_ls = [1, 2, 4, 8, 6, 3, 9, 5, 7]
 matrix_df = pd.DataFrame([[1 ,2 ,3], [4 ,5 ,6], [7 ,8 ,9]])
-bingo_df = pd.DataFrame(columns=range(matrix_size), index=range(matrix_size))
 
-for i in range(len(bingo_seq)):
-    bingo_num = bingo_seq[i] 
-    coordinate = np.where(matrix_df[:] == bingo_num) # 找特定值的坐標
-    bingo_df[int(coordinate[0]), int(coordinate[1])] = 1
-    for i in range(matrix_size):
-        if matrix_df.iloc[i,:].sum == 3 \
-            or matrix_df.iloc[:,i].sum == 3 \
-            or matrix_df.iloc[i,i].sum == 3:
-            print(bingo_seq[i])
+def bingo_condition(matrix_size, bingo_df, bingo):
+    for i in range(matrix_size): # bingo 條件
+        sum_diagonal_1 = 0 # 對角線
+        sum_diagonal_2 = 0 # 對角線2
+        sum_diagonal_1 += bingo_df.iloc[i,i]
+        sum_diagonal_2 += bingo_df.iloc[i,matrix_size-i-1]
+        if (bingo_df.iloc[i,:].aggregate(np.sum) == 3) \
+        or (bingo_df.iloc[:,i].aggregate(np.sum) == 3) \
+        or (sum_diagonal_1 == 3) or (sum_diagonal_2 == 3):
+            print('bingo!!')
+            return True
+
+def bingo_sequence(matrix_size, matrix_df, bingo_ls):
+    bingo_df = pd.DataFrame(columns=range(matrix_size), index=range(matrix_size))
+    for i in range(len(bingo_ls)): # 一個個叫號 
+        coordinate = np.where(matrix_df[:] == bingo_ls[i]) # 找叫號的坐標
+        bingo_df.iloc[int(coordinate[0]), int(coordinate[1])] = 1 # 在該位置設1
+        bingo = False
+        print('bingo_seq:', bingo_ls[i])
+        bingo = bingo_condition(matrix_size, bingo_df, bingo)
+        if bingo == True:
+            print(bingo_df)
+            return bingo_ls[i]
+
+bingo_sequence(matrix_size, matrix_df, bingo_ls)
 
 
 
