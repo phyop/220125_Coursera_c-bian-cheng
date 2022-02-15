@@ -4,49 +4,24 @@ import pandas as pd
 def read_input(path):
     f = open(path, "r")
     line_1 = f.readline()
-    persons, matrix_size = int(line_1.split()[0]), int(line_1.split()[1])
-    matrix_all = []
+    players, matrix_size = int(line_1.split()[0]), int(line_1.split()[1])
+    matrix_all = [] 
     matrix_dict = {}
-    for i in range(persons):
+    for i in range(players):
         ls_n = []
         for j in range(matrix_size):
             line2ls = f.readline().strip('\n').split()
             line2int = list(map(int,line2ls))
             ls_n.append(line2int)
         matrix_all.append(ls_n)
-    for i in range(persons):
+    for i in range(players):
         matrix_dict[i] = pd.DataFrame(matrix_all[i])
     bingo_ls = list(map(int, f.readline().split()))
-    return persons, matrix_size, matrix_dict, bingo_ls
+    return players, matrix_size, matrix_dict, bingo_ls
 
-def bingo(matrix_df, matrix_size, bingo_seq):
-    bingo_df = pd.DataFrame(columns=range(matrix_size), index=range(matrix_size))
-    pass
+def bingo_condition(matrix_size, bingo_df, bingo): # 加起來是3就代表連線了
     for i in range(matrix_size):
-        matrix_df.iloc[i,:] # row
-        matrix_df.iloc[:,i] # column
-        matrix_df.iloc[i,i] # diagonal
-    
-        
-
-if __name__ == "__main__":
-    path = "./in.txt"
-    persons, matrix_size, matrix_dict, bingo_ls = read_input(path)
-       
-
-
-########################################3
-
-import numpy as np
-import pandas as pd
-
-matrix_size = 3
-bingo_ls = [1, 2, 4, 8, 6, 3, 9, 5, 7]
-matrix_df = pd.DataFrame([[1 ,2 ,3], [4 ,5 ,6], [7 ,8 ,9]])
-
-def bingo_condition(matrix_size, bingo_df, bingo):
-    for i in range(matrix_size): # bingo 條件
-        sum_diagonal_1 = 0 # 對角線
+        sum_diagonal_1 = 0 # 對角線1
         sum_diagonal_2 = 0 # 對角線2
         sum_diagonal_1 += bingo_df.iloc[i,i]
         sum_diagonal_2 += bingo_df.iloc[i,matrix_size-i-1]
@@ -56,19 +31,29 @@ def bingo_condition(matrix_size, bingo_df, bingo):
             print('bingo!!')
             return True
 
-def bingo_sequence(matrix_size, matrix_df, bingo_ls):
-    bingo_df = pd.DataFrame(columns=range(matrix_size), index=range(matrix_size))
-    for i in range(len(bingo_ls)): # 一個個叫號 
-        coordinate = np.where(matrix_df[:] == bingo_ls[i]) # 找叫號的坐標
-        bingo_df.iloc[int(coordinate[0]), int(coordinate[1])] = 1 # 在該位置設1
-        bingo = False
-        print('bingo_seq:', bingo_ls[i])
-        bingo = bingo_condition(matrix_size, bingo_df, bingo)
-        if bingo == True:
-            print(bingo_df)
-            return bingo_ls[i]
+def bingo_game(players, matrix_size, matrix_dict, bingo_ls):
+    player_ls = range(players) # 建立玩家list
+    df = pd.DataFrame(columns=range(matrix_size), index=range(matrix_size)) # 空賓果盤是用來記錄叫號位置
+    condition_plate_ls = [df]*players # 每個玩家都要有1個空盤做記錄
+    for i in range(len(bingo_ls)): # 開始一個個叫號
+        bingo_num = bingo_ls[i] # 這回中了的話，這就是bingo數字
+        # 剩下玩家如果要繼續玩，可以在這行做player_ls的更新
+        for n in player_ls: # 剩下的玩家
+            condition_df = condition_plate_ls[n]
+            data_df = pd.DataFrame(matrix_dict[n])
+            coordinate = np.where(data_df[:] == bingo_num) # 在玩家賓果盤找對應坐標
+            condition_df.iloc[int(coordinate[0]), int(coordinate[1])] = 1 # 在空賓果盤的該位置設標記1
+            bingo = False # 還沒賓果成功
+            print('bingo_seq:', bingo_num)
+            bingo = bingo_condition(matrix_size, condition_df, bingo)
+            if bingo == True:
+                print(condition_df)
+                return bingo_num
 
-bingo_sequence(matrix_size, matrix_df, bingo_ls)
+if __name__ == "__main__":
+    path = "./in.txt"
+    players, matrix_size, matrix_dict, bingo_ls = read_input(path)
+    bingo_game(players, matrix_size, matrix_dict, bingo_ls)
 
 
 
