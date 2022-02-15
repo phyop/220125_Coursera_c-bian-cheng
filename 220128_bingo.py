@@ -6,26 +6,53 @@ def read_input(path):
     line_1 = f.readline()
     persons, matrix_size = int(line_1.split()[0]), int(line_1.split()[1])
     matrix_all = []
+    matrix_dict = {}
     for i in range(persons):
         ls_n = []
         for j in range(matrix_size):
-            ls_n.append(f.readline().strip('\n'))
+            line2ls = f.readline().strip('\n').split()
+            line2int = list(map(int,line2ls))
+            ls_n.append(line2int)
         matrix_all.append(ls_n)
+    for i in range(persons):
+        matrix_dict[i] = pd.DataFrame(matrix_all[i])
     bingo_seq = list(map(int, f.readline().split()))
-    return persons, matrix_size, matrix_all, bingo_seq
+    return persons, matrix_size, matrix_dict, bingo_seq
+
+def bingo(matrix_df, matrix_size, bingo_seq):
+    bingo_df = pd.DataFrame(columns=range(matrix_size), index=range(matrix_size))
+    pass
+    for i in range(matrix_size):
+        matrix_df.iloc[i,:] # row
+        matrix_df.iloc[:,i] # column
+        matrix_df.iloc[i,i] # diagonal
+    
+        
 
 if __name__ == "__main__":
     path = "./in.txt"
-    persons, matrix_size, matrix_all, bingo_seq = read_input(path)
-    
-    
-    
-    
+    persons, matrix_size, matrix_dict, bingo_seq = read_input(path)
 
 
+########################################3
 
-    
-    
+import numpy as np
+import pandas as pd
+
+matrix_size = 3
+bingo_seq = [1, 2, 4, 8, 6, 3, 9, 5, 7]
+matrix_df = pd.DataFrame([[1 ,2 ,3], [4 ,5 ,6], [7 ,8 ,9]])
+bingo_df = pd.DataFrame(columns=range(matrix_size), index=range(matrix_size))
+
+for i in range(len(bingo_seq)):
+    bingo_num = bingo_seq[i] 
+    coordinate = np.where(matrix_df[:] == bingo_num) # 找特定值的坐標
+    bingo_df[int(coordinate[0]), int(coordinate[1])] = 1
+    for i in range(matrix_size):
+        if matrix_df.iloc[i,:].sum == 3 \
+            or matrix_df.iloc[:,i].sum == 3 \
+            or matrix_df.iloc[i,i].sum == 3:
+            print(bingo_seq[i])
 
 
 
