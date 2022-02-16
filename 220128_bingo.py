@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import copy
 
 def read_input(path):
     f = open(path, "r")
@@ -19,43 +20,52 @@ def read_input(path):
     bingo_ls = list(map(int, f.readline().split()))
     return players, matrix_size, matrix_dict, bingo_ls
 
-def bingo_condition(matrix_size, bingo_df, bingo): # 加起來是3就代表連線了
+def bingo_condition(matrix_size, bingo_df): # 加起來是matrix_size就代表連線了
+    sum_diagonal_1 = 0 # 對角線1
+    sum_diagonal_2 = 0 # 對角線2
     for i in range(matrix_size):
-        sum_diagonal_1 = 0 # 對角線1
-        sum_diagonal_2 = 0 # 對角線2
         sum_diagonal_1 += bingo_df.iloc[i,i]
         sum_diagonal_2 += bingo_df.iloc[i,matrix_size-i-1]
-        if (bingo_df.iloc[i,:].aggregate(np.sum) == 3) \
-        or (bingo_df.iloc[:,i].aggregate(np.sum) == 3) \
-        or (sum_diagonal_1 == 3) or (sum_diagonal_2 == 3):
+        if (bingo_df.iloc[i,:].aggregate(np.sum) == matrix_size) \
+        or (bingo_df.iloc[:,i].aggregate(np.sum) == matrix_size) \
+        or (sum_diagonal_1 == matrix_size) or (sum_diagonal_2 == matrix_size):
             return True
 
 def bingo_game(players, matrix_size, matrix_dict, bingo_ls):
     player_ls = range(players) # 建立玩家list
     df = pd.DataFrame(columns=range(matrix_size), index=range(matrix_size)) # 空賓果盤是用來記錄叫號位置
-    condition_plate_ls = [df]*players # 每個玩家都要有1個空盤做記錄
+    condition_plate_ls = [copy.deepcopy(df) for i in range(players)] # 每個玩家都要有1個空盤做記錄
+    winner_ls = []
+    bingo = False # 發到有人bingo的數字，並且所有人都對過號之後，就可以結束迴圈了
     for i in range(len(bingo_ls)): # 開始一個個叫號
         bingo_num = bingo_ls[i] # 這回中了的話，這就是bingo數字
+        # print('bingo_ls[i]',bingo_num)
         # 剩下玩家如果要繼續玩，可以在這行做player_ls的更新
-        bingo = False # 還沒賓果成功
-        for n in player_ls: # 剩下的玩家
+        for n in player_ls: # 剩winner_ls.append(n)下的玩家220 4 5 6
+            winner = False # 初始化，會拿到號碼的玩家，就代表還沒有嬴
+            # print('player', n)
             condition_df = condition_plate_ls[n]
             data_df = pd.DataFrame(matrix_dict[n])
             coordinate = np.where(data_df[:] == bingo_num) # 在玩家賓果盤找對應坐標
             condition_df.iloc[int(coordinate[0]), int(coordinate[1])] = 1 # 在空賓果盤的該位置設標記1    
-            bingo = bingo_condition(matrix_size, condition_df, bingo)
-            if bingo == True:
-                print(n, end=' ')
+            # print('condition_df: ',condition_df) 
+            # print('condition_plate_ls: ',condition_plate_ls)
+            winner = bingo_condition(matrix_size, condition_df)
+            if winner == True: 
+                bingo = True # 如果有winner出現，就代表bingo遊戲可以停止發號了
+                winner_ls.append(n)
+                # print('bingo!')
+                # print(condition_df)
         if bingo == True:
-            print(bingo_num, end=' ')
+            winner_ls.insert(0, bingo_num)
+            for n in winner_ls:
+                print(n, end=' ') 
             break
 
 if __name__ == "__main__":
     path = "./in.txt"
     players, matrix_size, matrix_dict, bingo_ls = read_input(path)
     bingo_game(players, matrix_size, matrix_dict, bingo_ls)
-
-
 
 
 
@@ -92,4 +102,12 @@ m 是一個正整數且不大於 256。
 
 輸出範例
 3 0 1
+"""
+
+"""
+1 0 1 3
+1 1 4 5 6 8
+28 2 3
+33 0
+200 2
 """
