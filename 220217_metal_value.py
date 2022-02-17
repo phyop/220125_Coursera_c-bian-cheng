@@ -1,3 +1,44 @@
+def metal_dict(metal_ls, value_ls):
+    metal_value_dict = {}
+    metal_value_dict = dict(zip(metal_ls, value_ls))
+    return metal_value_dict
+
+def total_price(metal_type, width, height, length, metal_value_dict):
+    # 如果按照原題的main，那type:value的對應勢必要寫死在int value()中，這樣不好
+    if metal_type not in metal_value_dict.keys():
+        return -1
+    if width <= 0 or height <= 0 or length <= 0:
+        return -2
+    temp = gcd(width, height)
+    bulk_gcd = gcd(temp, length)
+    cubic_vol = bulk_gcd**3
+    cubic_numbers = width/bulk_gcd * height/bulk_gcd * length/bulk_gcd
+    value = metal_value_dict[metal_type]
+    price = cubic_vol**2 * cubic_numbers * value
+    return int(price)
+
+def gcd(a, b):
+    if (a%b) == 0:
+        return b
+    else:
+        return gcd(b, a%b)
+
+if __name__ == "__main__":
+    # 金、銀、銅、鉛、鐵、鈦
+    metal_ls = [79 ,47 ,29 ,82 ,26 ,22]
+    value_ls = [30, 10, 4, 5, 3, 9]
+    metal_value_dict = metal_dict(metal_ls, value_ls) # 建立各金屬單價的字典
+
+    file_from = './in.txt'
+    with open(file_from, 'r') as f:
+        for line in f:
+            try:
+                metal_type, width, height, length = map(int, line.strip().split())
+                price = total_price(metal_type, width, height, length, metal_value_dict)
+                print(price)
+            except:
+                None # 遇到空行時，什麼也不做，就繼續讀下一個line
+
 """
 1*1*1大小的金塊，切成長1的正方體塊價值：(1*1*1)**2 * 1方塊 * 30元 = 30
 2*2*2大小的金塊，切成長1的正方體塊價值：(1*1*1)**2 * 8方塊 * 30元 = 240
@@ -5,35 +46,6 @@
 4*8*2大小的金塊，切成長1的正方體塊價值：(1*1*1)**2 * 64方塊 * 30元 = 1920
 4*8*2大小的金塊，切成長2的正方體塊價值：(2*2*2)**2 * (4/2 × 8/2 × 2/2)方塊 * 30元 = 15360（切長1的價格才1920）
 """
-def readin(file_from):
-    f = open(file_from, 'r')
-    line = f.readline()
-    metal_type, width, height, length = map(int, line.strip().split())
-    return metal_type, width, height, length
-
-def total_price(metal_type, width, height, length, metal_value_dict):
-    # 如果按照原題的main，那type:value的對應勢必要寫死在int value()中，這樣不好
-    vol = width * height * length
-    value = metal_value_dict[metal_type]
-    price = vol**2 * value
-    return price
-
-def metal_dict(metal_ls, value_ls):
-    metal_value_dict = {}
-    metal_value_dict = dict(zip(metal_ls, value_ls))
-    return metal_value_dict
-
-# 金、銀、銅、鉛、鐵、鈦
-file_from = './in.txt'
-metal_type, width, height, length = readin(file_from)
-
-metal_ls = [79 ,47 ,29 ,82 ,26 ,22]
-value_ls = [30, 10, 4, 5, 3, 9]
-metal_value_dict = metal_dict(metal_ls, value_ls)
-
-price = total_price(metal_type, width, height, length, metal_value_dict)
-print(price)
-
 
 """
 題目敘述
