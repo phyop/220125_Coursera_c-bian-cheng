@@ -2,7 +2,7 @@ def card_shuffle(card_ls):
     even=True if len(card_ls)%2 == 0 else False
     half1_len = len(card_ls)//2 if even else len(card_ls)//2 + 1
     half1_ls = card_ls[0:half1_len]
-    half2_ls = card_ls[half1_len:]
+    half2_ls = card_ls[half1_len:] # 不能寫-1，因為切片是左閉右開
     shuffled_ls = []
     for i in range(half1_len-1): # 因為最後一張牌要特別處理，所以不列入
         shuffled_ls.append(half1_ls[i])
